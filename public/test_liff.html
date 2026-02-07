@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LIFF Test (No Auto Login)</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:24px;line-height:1.6}
+    .box{padding:16px;border:1px solid #ddd;border-radius:12px;max-width:820px}
+    button{padding:10px 14px;border-radius:10px;border:1px solid #bbb;background:#fff;cursor:pointer}
+    pre{background:#f6f6f6;padding:12px;border-radius:12px;overflow:auto}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    .ok{color:#0a7b34}
+    .warn{color:#a36a00}
+  </style>
+</head>
+<body>
+  <h2>LIFF Test (ไม่เด้ง login อัตโนมัติ)</h2>
+
+ß  <div class="box">
+    <p id="status" class="warn">กำลังเริ่มต้น…</p>
+
+    <div class="row">
+      <button id="loginBtn" style="display:none;">ล็อกอินด้วย LINE</button>
+      <button id="profileBtn" style="display:none;">ดึงโปรไฟล์</button>
+      <button id="logoutBtn" style="display:none;">Logout (เฉพาะเปิดจากบราวเซอร์)</button>
+    </div>
+
+    <h3>Debug</h3>
+    <pre id="debug"></pre>
+  </div>
+
+  <script>
+    const LIFF_ID = "2008828976-6MQxt04H";
+
+    const $ = (id) => document.getElementById(id);
+    const log = (obj) => { $("debug").textContent = JSON.stringify(obj, null, 2); };
+
+    async function main() {
+      try {
+        await liff.init({ liffId: LIFF_ID });
+
+        const insideClient = liff.isInClient();      // เปิดในแอป LINE ไหม
+        const loggedIn = liff.isLoggedIn();          // มี session แล้วไหม
+
+        $("status").innerHTML =
+          `init ผ่าน ✅ | inClient=${insideClient} | loggedIn=${loggedIn}`;
+        $("status").className = "ok";
+
+        // แสดงปุ่มตามสถานะ
+        if (!loggedIn) {
+          $("loginBtn").style.display = "inline-block";
+          $("loginBtn").onclick = () => liff.login({ redirectUri: location.href });
+          log({
+            note: "ยังไม่ล็อกอิน -> ให้กดปุ่มล็อกอินเอง (ไม่ auto)",
+            href: location.href
+          });
+          return;
+        }
+
+        // ล็อกอินแล้ว
+        $("profileBtn").style.display = "inline-block";
+        $("profileBtn").onclick = async () => {
+          const profile = await liff.getProfile();
+          log({ profile, idToken: liff.getIDToken() });
+        };
+
+        // logout ทำได้เฉพาะนอก LINE app
+        if (!insideClient) {
+          $("logoutBtn").style.display = "inline-block";
+          $("logoutBtn").onclick = () => { liff.logout(); location.reload(); };
+        }
+
+        log({
+          note: "ล็อกอินแล้ว -> กดดึงโปรไฟล์ได้",
+          inClient: insideClient,
+          os: liff.getOS(),
+          language: liff.getLanguage(),
+          version: liff.getVersion(),
+          isLoggedIn: loggedIn
+        });
+      } catch (e) {
+        $("status").textContent = "init ไม่ผ่าน ❌ (เช็ค LIFF_ID / Endpoint URL / setting ใน LINE Developers)";
+        $("status").className = "warn";
+        log({ error: String(e), hint: "ลองเปิดหน้านี้ผ่านลิงก์ liff.line.me ด้วย" });
+      }
+    }
+
+    main();
+  </script>
+</body>
+</html>

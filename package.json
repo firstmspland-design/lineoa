@@ -1,0 +1,36 @@
+{
+  "name": "lineoa",
+  "version": "1.0.0",
+  "description": "ข้อมูล line oa",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "DOTENV_CONFIG_QUIET=true node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/firstmspland-design/lineoa.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/firstmspland-design/lineoa/issues"
+  },
+  "homepage": "https://github.com/firstmspland-design/lineoa#readme",
+  "dependencies": {
+    "@line/bot-sdk": "^10.5.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "loadash": "^1.0.0",
+    "mysql2": "^3.16.1",
+    "pg": "^8.17.1",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}

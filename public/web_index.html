@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Nu - Yukisama800 | เพื่อนคู่คิด มิตรแท้คนอยากมีลูก</title>
+    
+    <!-- Google Fonts: Sarabun -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Theme Colors: Pastel & Trustworthy */
+            --primary-pink: #FFE4E8;      /* ชมพูพาสเทล */
+            --primary-dark-pink: #FFB7C5; /* ชมพูเข้มขึ้นสำหรับ Hover */
+            --soft-blue: #E3F2FD;         /* ฟ้าละมุน */
+            --trust-blue: #6FA3C3;        /* ฟ้าอมเทา ดูน่าเชื่อถือ เป็นทางการ */
+            --bg-cream: #FFFCF7;          /* พื้นหลังครีมสบายตา */
+            --text-main: #555555;
+            --text-light: #888888;
+            --white: #FFFFFF;
+            --gold: #D4AF37;              /* สีทองสำหรับ Project มิ่งมงคล */
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
+            --radius: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-cream);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* --- Navigation --- */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i { color: var(--trust-blue); font-size: 1.6rem; }
+        .logo span { color: #FF8BA7; font-weight: 400; font-size: 1rem; margin-left: 5px;}
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--trust-blue);
+            cursor: pointer;
+        }
+
+        .menu {
+            display: flex;
+            gap: 10px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .menu li a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            padding: 8px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .menu li a:hover, .menu li a.active {
+            background-color: var(--primary-pink);
+            color: #C25E70;
+            font-weight: 600;
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 80vh;
+        }
+
+        /* Page Transitions */
+        .page-section {
+            display: none;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2, h3 { color: var(--trust-blue); margin-top: 0; font-weight: 600; }
+        p { margin-bottom: 1.5rem; color: #666; }
+
+        /* --- Components --- */
+        
+        /* NEW HERO SECTION DESIGN */
+        .hero-banner {
+            padding: 40px;
+            background: linear-gradient(135deg, #FFF 0%, #FFF0F3 100%);
+            border-radius: var(--radius);
+            margin-bottom: 50px;
+            position: relative;
+            overflow: visible; /* Allow images to pop out slightly if needed */
+        }
+
+        /* Flex Layout for Hero */
+        .hero-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-text {
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .hero-visuals {
+            flex: 1;
+            position: relative;
+            height: 400px; /* Fixed height for composition */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Background Shapes */
+        .hero-bg-blob {
+            position: absolute;
+            background: var(--soft-blue);
+            width: 300px;
+            height: 300px;
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            opacity: 0.4;
+            top: 10%;
+            right: 10%;
+            z-index: 0;
+            animation: morph 8s ease-in-out infinite;
+        }
+        
+        @keyframes morph {
+            0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+            50% { border-radius: 60% 40% 30% 70% / 60% 50% 40% 50%; }
+            100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+        }
+
+        /* Image Composition */
+        .img-family {
+            width: 320px;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: absolute;
+            right: 0;
+            top: 20px;
+            z-index: 1;
+            border: 4px solid white;
+        }
+
+        .img-doctor {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 6px solid white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            position: absolute;
+            left: 20px;
+            bottom: 40px;
+            z-index: 2;
+            background-color: #eee;
+        }
+
+        .badge-doctor {
+            position: absolute;
+            bottom: 30px;
+            left: 50px;
+            z-index: 3;
+            background: var(--trust-blue);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .hero-h1 {
+            font-size: 2.5rem;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+        
+        .hero-highlight {
+            color: #FF8BA7;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--trust-blue);
+            color: var(--white);
+            border-radius: 50px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 10px rgba(111, 163, 195, 0.3);
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(111, 163, 195, 0.5);
+            background-color: #5D91B0;
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--trust-blue);
+            border: 2px solid var(--trust-blue);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--trust-blue);
+            color: white;
+        }
+        
+        .btn-gold {
+            background-color: var(--gold);
+            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+        }
+        
+        .btn-gold:hover {
+            background-color: #B89628;
+        }
+
+        /* Cards */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid #F8F8F8;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            border-color: var(--primary-pink);
+        }
+
+        .card i {
+            font-size: 2.5rem;
+            color: var(--trust-blue);
+            margin-bottom: 15px;
+            background: var(--soft-blue);
+            padding: 20px;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* About Section */
+        .about-layout {
+            display: flex;
+            gap: 40px;
+            align-items: start;
+            flex-wrap: wrap;
+        }
+        
+        .about-text {
+            flex: 2;
+        }
+        
+        .about-stats {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            min-width: 250px;
+        }
+
+        /* Project Ming Mongkol */
+        .ming-mongkol-hero {
+            background-color: #FFFAF0; /* Gold tint */
+            padding: 40px;
+            border-radius: var(--radius);
+            border-left: 8px solid var(--gold);
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .ming-mongkol-hero::after {
+            content: '✨';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 3rem;
+            opacity: 0.5;
+        }
+
+        /* Knowledge Hub */
+        .content-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        
+        .filter-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1px solid #eee;
+            background: white;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .filter-btn.active {
+            background: var(--trust-blue);
+            color: white;
+            border-color: var(--trust-blue);
+        }
+
+        .video-card {
+            text-align: left;
+            overflow: hidden;
+            padding: 0;
+        }
+        
+        .video-thumbnail {
+            height: 160px;
+            background: #ddd;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+        
+        .video-content {
+            padding: 20px;
+        }
+        
+        .video-tag {
+            font-size: 0.8rem;
+            color: var(--trust-blue);
+            font-weight: 600;
+            background: var(--soft-blue);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        /* Contact */
+        .contact-methods {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .contact-pill {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--white);
+            padding: 15px 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            width: 300px;
+            transition: 0.3s;
+        }
+        
+        .contact-pill:hover {
+            transform: scale(1.02);
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 60px;
+            border-top: 1px solid #eee;
+            background: white;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .menu { 
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: white;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                padding: 10px 0;
+            }
+            
+            .menu.show { display: flex; }
+            .menu-toggle { display: block; }
+            .menu li a { display: block; padding: 10px 20px; border-radius: 0; }
+            
+            /* Hero Mobile Adjustments */
+            .hero-wrapper { flex-direction: column-reverse; text-align: center; }
+            .hero-visuals { width: 100%; height: 350px; }
+            .hero-text { width: 100%; }
+            .img-family { width: 80%; right: 10%; }
+            .img-doctor { left: 50%; transform: translateX(-50%); bottom: 20px; }
+            .badge-doctor { left: 50%; transform: translateX(-50%); bottom: 10px; }
+            .hero-h1 { font-size: 1.8rem; }
+            
+            .about-layout { flex-direction: column; }
+            .contact-pill { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HEADER & MENU -->
+    <header>
+        <nav>
+            <a href="#" class="logo" onclick="switchPage('home')">
+                <i class="fa-solid fa-user-doctor"></i>
+                <div>Dr. Nu <span>Yukisama800</span></div>
+            </a>
+            
+            <div class="menu-toggle" onclick="toggleMenu()">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+
+            <ul class="menu" id="mainMenu">
+                <li><a onclick="switchPage('home')" id="nav-home" class="active">หน้าแรก</a></li>
+                <li><a onclick="switchPage('about')" id="nav-about">รู้จักหมอหนู</a></li>
+                <li><a onclick="switchPage('approach')" id="nav-approach">แนวทางการดูแล</a></li>
+                <li><a onclick="switchPage('project')" id="nav-project">Project มิ่งมงคล</a></li>
+                <li><a onclick="switchPage('knowledge')" id="nav-knowledge">ความรู้ IVF</a></li>
+                <li><a onclick="switchPage('contact')" id="nav-contact">ติดต่อ</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- 2. CONTENT AREA -->
+    <div class="container">
+
+        <!-- === PAGE: HOME (UPDATED) === -->
+        <section id="home" class="page-section active">
+            
+            <!-- New Hero Design -->
+            <div class="hero-banner">
+                <div class="hero-bg-blob"></div>
+                
+                <div class="hero-wrapper">
+                    <div class="hero-text">
+                        <h1 class="hero-h1">สานฝัน... <br>ให้คำว่า <span class="hero-highlight">"ครอบครัว"</span> สมบูรณ์</h1>
+                        <p style="font-size: 1.1rem; color: #666; margin-bottom: 30px;">
+                            พร้อมเดินเคียงข้างคุณในทุกขั้นตอนของการมีเจ้าตัวน้อย <br>
+                            ด้วยความเชี่ยวชาญและความเข้าใจ จาก <strong>หมอหนู (Dr. Nu)</strong>
+                        </p>
+                        
+                        <div>
+                            <button class="btn btn-gold" onclick="switchPage('project')">
+                                <i class="fa-solid fa-star"></i> Project มิ่งมงคล
+                            </button>
+                            <button class="btn btn-secondary" onclick="switchPage('approach')">
+                                ปรึกษามีบุตรยาก
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="hero-visuals">
+                        <!-- Image 1: Warm Family (Background) -->
+                        <img src="https://images.unsplash.com/photo-1544126592-807ade215a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                             alt="Happy Asian Family with Baby" class="img-family">
+                        
+                        <!-- Image 2: Dr. Nu (Foreground Overlay) -->
+                        <img src="https://ui-avatars.com/api/?name=Dr+Nu&background=FFB7C5&color=fff&size=200" 
+                             alt="Dr. Nu Profile" class="img-doctor">
+                        
+                        <!-- Badge -->
+                        <div class="badge-doctor">
+                            <i class="fa-solid fa-user-doctor"></i> Dr. Nu Yukisama800
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End New Hero -->
+
+            <div class="grid-cards">
+                <div class="card" onclick="switchPage('knowledge')">
+                    <i class="fa-brands fa-tiktok"></i>
+                    <h3>คลังความรู้ IVF</h3>
+                    <p>รวมคลิปและบทความย่อยง่าย จาก TikTok สู่เว็บไซต์ อ่านจบเข้าใจทันที</p>
+                </div>
+                <div class="card" onclick="switchPage('approach')">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                    <h3>การดูแลด้วยใจ</h3>
+                    <p>ไม่เน้นแค่ยา แต่เน้นความสบายใจ ออกแบบการรักษาแบบรายบุคคล</p>
+                </div>
+                <div class="card" onclick="switchPage('contact')">
+                    <i class="fa-regular fa-calendar-check"></i>
+                    <h3>นัดหมายง่ายๆ</h3>
+                    <p>ทักไลน์ OA ปรึกษาเบื้องต้น หรือนัดคิวเข้ามาคุยกันได้เลยค่ะ</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- === PAGE: ABOUT === -->
+        <section id="about" class="page-section">
+            <h2>รู้จัก "หมอหนู" (Dr. Nu)</h2>
+            <div class="about-layout">
+                <div class="about-text">
+                    <h3 style="color: var(--text-main); font-size: 1.2rem;">ตัวตนและแนวคิดการดูแล</h3>
+                    <p><strong>"ความสำเร็จเริ่มจากความสบายใจ"</strong></p>
+                    <p>หมอเป็นสูตินารีแพทย์ผู้เชี่ยวชาญด้านเวชศาสตร์การเจริญพันธุ์ ที่เชื่อว่าการรักษาภาวะมีบุตรยาก ไม่ใช่เรื่องเครียดเสมอไป หมออยากสร้างพื้นที่ที่คนไข้สามารถเข้ามาคุยได้ทุกเรื่อง เหมือนมาหาเพื่อนที่มีความรู้เฉพาะทาง</p>
+                    <p>หลายครั้งที่ความกังวลเป็นอุปสรรค หมอจึงเน้นการพูดคุยเพื่อให้คนไข้คลายกังวล ก่อนเริ่มกระบวนการรักษา เพื่อให้ร่างกายและจิตใจพร้อมที่สุดค่ะ</p>
+                </div>
+                <div class="about-stats">
+                    <h4 style="margin-top:0; color: var(--trust-blue);"><i class="fa-solid fa-certificate"></i> ประสบการณ์</h4>
+                    <ul style="padding-left: 20px; color: #666;">
+                        <li style="margin-bottom: 10px;">เชี่ยวชาญด้าน IVF, ICSI, IUI</li>
+                        <li style="margin-bottom: 10px;">การผ่าตัดส่องกล้องทางนรีเวช</li>
+                        <li style="margin-bottom: 10px;">Influencer สายแม่และเด็ก</li>
+                    </ul>
+                    <div style="background: var(--primary-pink); padding: 10px; border-radius: 10px; text-align: center; margin-top: 20px;">
+                        <div style="font-weight: bold; font-size: 1.2rem; color: #D66D75;">200K+</div>
+                        <small>Followers on TikTok</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- === PAGE: APPROACH === -->
+        <section id="approach" class="page-section">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h2>แนวทางการดูแล (Approach to Care)</h2>
+                <p>เพราะร่างกายของทุกคนไม่เหมือนกัน แผนการรักษาจึงต้อง "Tailor-made"</p>
+            </div>
+            
+            <div class="grid-cards">
+                <div class="card" style="text-align: left;">
+                    <i class="fa-solid fa-magnifying-glass-chart" style="font-size: 1.5rem; width: 60px; height: 60px;"></i>
+                    <h3 style="margin-top: 10px;">1. การประเมิน</h3>
+                    <p>หาสาเหตุที่แท้จริงทั้งหญิงและชาย ตรวจฮอร์โมนและอัลตราซาวด์อย่างละเอียด ไม่เสียเวลาลองผิดลองถูก</p>
+                </div>
+                <div class="card" style="text-align: left;">
+                    <i class="fa-solid fa-clipboard-user" style="font-size: 1.5rem; width: 60px; height: 60px;"></i>
+                    <h3 style="margin-top: 10px;">2. Personalized Plan</h3>
+                    <p>ปรับยาและเทคนิคตามฮอร์โมนและร่างกายของคุณ ไม่ใช้สูตรสำเร็จแบบเหมาเข่ง</p>
+                </div>
+                <div class="card" style="text-align: left;">
+                    <i class="fa-solid fa-hand-holding-heart" style="font-size: 1.5rem; width: 60px; height: 60px;"></i>
+                    <h3 style="margin-top: 10px;">3. ดูแลใจ</h3>
+                    <p>ลดความเครียดระหว่างทาง เพราะ "ใจที่สุข" ช่วยให้ "ไข่สมบูรณ์" และเพิ่มโอกาสตั้งครรภ์</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px; background: white; padding: 30px; border-radius: var(--radius); border: 1px solid #eee;">
+                <h3><i class="fa-regular fa-circle-question"></i> คำถามที่พบบ่อย (FAQ)</h3>
+                
+                <details style="padding:15px; border-bottom:1px solid #eee; cursor:pointer;">
+                    <summary style="font-weight:600; color: var(--text-main);">ทำ IVF เจ็บไหม?</summary>
+                    <p style="margin-top:10px; font-size:0.9rem; padding-left: 15px;">อาจมีความรู้สึกหน่วงๆ บ้างเล็กน้อยช่วงเก็บไข่ แต่เรามียาระงับความรู้สึกดูแลอย่างดี ไม่น่ากลัวอย่างที่คิดค่ะ</p>
+                </details>
+                
+                <details style="padding:15px; border-bottom:1px solid #eee; cursor:pointer;">
+                    <summary style="font-weight:600; color: var(--text-main);">อายุ 40+ ยังมีโอกาสไหม?</summary>
+                    <p style="margin-top:10px; font-size:0.9rem; padding-left: 15px;">อายุเป็นปัจจัยสำคัญ แต่ไม่ใช่ทั้งหมดค่ะ หมอมีเคส 40+ ที่สำเร็จหลายเคส ขึ้นอยู่กับคุณภาพไข่และการเตรียมตัว</p>
+                </details>
+                
+                <details style="padding:15px; cursor:pointer;">
+                    <summary style="font-weight:600; color: var(--text-main);">ต้องเตรียมตัวนานแค่ไหนก่อนเริ่ม?</summary>
+                    <p style="margin-top:10px; font-size:0.9rem; padding-left: 15px;">แนะนำให้บำรุงล่วงหน้าอย่างน้อย 3 เดือน ทั้งเรื่องอาหาร วิตามิน และการพักผ่อนค่ะ</p>
+                </details>
+            </div>
+        </section>
+
+        <!-- === PAGE: PROJECT MING MONGKOL === -->
+        <section id="project" class="page-section">
+            <div class="ming-mongkol-hero">
+                <h2 style="color: #B8860B; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Project มิ่งมงคล
+                </h2>
+                <p><strong>"เตรียมกายให้พร้อม เตรียมใจให้ปัง รับข่าวดี"</strong></p>
+                <p style="color: #555;">โปรเจกต์พิเศษที่หมอตั้งใจทำขึ้น เพื่อเป็นตัวช่วยเสริมพลังใจ ให้ว่าที่คุณแม่ทุกคนมีความหวังและกำลังใจในการเตรียมตัวมีเจ้าตัวน้อย ผสานศาสตร์การแพทย์เข้ากับการดูแลจิตใจ</p>
+                <button class="btn btn-gold" style="margin-top: 15px;">เข้าร่วมโปรเจกต์</button>
+            </div>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                <div style="flex: 1; min-width: 300px; background: white; padding: 25px; border-radius: 15px; box-shadow: var(--shadow);">
+                    <h3><i class="fa-solid fa-users-viewfinder"></i> เหมาะกับใคร?</h3>
+                    <ul style="line-height: 2; list-style: none; padding: 0;">
+                        <li><i class="fa-solid fa-check" style="color: #4CAF50;"></i> ผู้ที่กำลังเข้าสู่กระบวนการ IVF/ICSI</li>
+                        <li><i class="fa-solid fa-check" style="color: #4CAF50;"></i> ผู้ที่เคยผิดหวัง และต้องการกำลังใจเริ่มต้นใหม่</li>
+                        <li><i class="fa-solid fa-check" style="color: #4CAF50;"></i> ผู้ที่ต้องการเคล็ดลับการดูแลตัวเองแบบ Exclusive</li>
+                    </ul>
+                </div>
+                <div style="flex: 1; min-width: 300px; background: #fafafa; padding: 25px; border-radius: 15px; border: 2px dashed #ccc;">
+                    <h3 style="color: #888;"><i class="fa-solid fa-circle-exclamation"></i> ข้อชี้แจง (Disclaimer)</h3>
+                    <p style="font-size: 0.9rem; color: #777;">Project นี้จัดทำขึ้นเพื่อส่งเสริมกำลังใจและการเตรียมความพร้อมของร่างกาย ไม่ใช่การรับประกันผลลัพธ์ทางการแพทย์ 100% ผลการรักษาขึ้นอยู่กับปัจจัยสุขภาพของแต่ละบุคคล และควรอยู่ภายใต้การดูแลของแพทย์</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- === PAGE: KNOWLEDGE === -->
+        <section id="knowledge" class="page-section">
+            <h2>คลังความรู้ (Knowledge Hub)</h2>
+            <p>สาระดีๆ จากหมอหนู ที่คัดมาแล้วว่า "ต้องรู้"</p>
+            
+            <div class="content-filter">
+                <button class="filter-btn active">ทั้งหมด</button>
+                <button class="filter-btn">IVF/ICSI</button>
+                <button class="filter-btn">เตรียมตัวก่อนท้อง</button>
+                <button class="filter-btn">Q&A หมอหนูตอบเอง</button>
+            </div>
+
+            <div class="grid-cards" style="margin-top: 10px;">
+                <!-- Video Card 1 -->
+                <div class="card video-card">
+                    <div class="video-thumbnail" style="background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);">
+                        <i class="fa-solid fa-play" style="background: transparent; font-size: 3rem;"></i>
+                    </div>
+                    <div class="video-content">
+                        <span class="video-tag">IVF/ICSI</span>
+                        <h4 style="margin: 10px 0;">รู้ทัน "ภาวะรังไข่เสื่อม" ก่อนจะสาย</h4>
+                        <p style="font-size: 0.9rem; margin-bottom: 0;">สัญญาณเตือนที่สาวๆ ต้องเช็คด่วน...</p>
+                    </div>
+                </div>
+
+                <!-- Video Card 2 -->
+                <div class="card video-card">
+                    <div class="video-thumbnail" style="background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);">
+                        <i class="fa-solid fa-play" style="background: transparent; font-size: 3rem;"></i>
+                    </div>
+                    <div class="video-content">
+                        <span class="video-tag">อาหารบำรุง</span>
+                        <h4 style="margin: 10px 0;">กินอย่างไร ให้ไข่สวย?</h4>
+                        <p style="font-size: 0.9rem; margin-bottom: 0;">รวมลิสต์อาหารบำรุงไข่ สำหรับคนเตรียมทำ ICSI</p>
+                    </div>
+                </div>
+
+                <!-- Video Card 3 -->
+                <div class="card video-card">
+                    <div class="video-thumbnail" style="background: linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%);">
+                        <i class="fa-solid fa-file-lines" style="background: transparent; font-size: 3rem;"></i>
+                    </div>
+                    <div class="video-content">
+                        <span class="video-tag">บทความ</span>
+                        <h4 style="margin: 10px 0;">ขั้นตอนเก็บไข่ น่ากลัวไหม?</h4>
+                        <p style="font-size: 0.9rem; margin-bottom: 0;">เจาะลึกทุกขั้นตอนแบบละเอียด อ่านจบหายกลัว</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- === PAGE: CONTACT === -->
+        <section id="contact" class="page-section">
+            <h2 style="text-align: center; margin-bottom: 40px;">ช่องทางติดต่อ</h2>
+            
+            <div class="contact-methods">
+                <a href="#" class="contact-pill" style="text-decoration: none; color: inherit;">
+                    <div class="contact-icon" style="background: #06C755;">
+                        <i class="fa-brands fa-line"></i>
+                    </div>
+                    <div>
+                        <small style="color: #999;">LINE Official</small>
+                        <div style="font-weight: bold; color: #06C755; font-size: 1.1rem;">@dr.nu_ivf</div>
+                    </div>
+                </a>
+
+                <a href="#" class="contact-pill" style="text-decoration: none; color: inherit;">
+                    <div class="contact-icon" style="background: #000;">
+                        <i class="fa-brands fa-tiktok"></i>
+                    </div>
+                    <div>
+                        <small style="color: #999;">TikTok</small>
+                        <div style="font-weight: bold; color: #000; font-size: 1.1rem;">@yukisama800</div>
+                    </div>
+                </a>
+
+                <a href="#" class="contact-pill" style="text-decoration: none; color: inherit;">
+                    <div class="contact-icon" style="background: #EA4335;">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                    <div>
+                        <small style="color: #999;">Email</small>
+                        <div style="font-weight: bold; color: #EA4335; font-size: 1.1rem;">contact@dr-nu.com</div>
+                    </div>
+                </a>
+            </div>
+
+            <div style="text-align: center; margin-top: 50px; background: white; padding: 40px; border-radius: 15px; border: 1px solid #eee;">
+                <i class="fa-solid fa-location-dot" style="font-size: 2.5rem; color: var(--trust-blue); margin-bottom: 15px;"></i>
+                <h3 style="margin-top: 0;">สถานที่ตรวจ</h3>
+                <p>คลินิก / โรงพยาบาล (ระบุสถานที่จริงที่นี่)</p>
+                <div style="display: inline-block; background: #f9f9f9; padding: 10px 20px; border-radius: 50px; font-size: 0.9rem;">
+                    🕒 เวลาทำการ: จันทร์ - ศุกร์ (09:00 - 17:00 น.)
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2024 Dr. Nu Yukisama800. All Rights Reserved.</p>
+        <p style="color: var(--trust-blue);">สร้างความมั่นใจ คืนรอยยิ้ม ให้ครอบครัว</p>
+    </footer>
+
+    <!-- 3. JAVASCRIPT LOGIC -->
+    <script>
+        function switchPage(pageId) {
+            // 1. Hide all sections
+            const sections = document.querySelectorAll('.page-section');
+            sections.forEach(sec => sec.classList.remove('active'));
+
+            // 2. Show selected section
+            const target = document.getElementById(pageId);
+            if (target) {
+                target.classList.add('active');
+            }
+
+            // 3. Update active menu
+            const menus = document.querySelectorAll('.menu li a');
+            menus.forEach(m => m.classList.remove('active'));
+
+            const activeMenu = document.getElementById('nav-' + pageId);
+            if (activeMenu) {
+                activeMenu.classList.add('active');
+            }
+
+            // Close mobile menu if open
+            document.getElementById('mainMenu').classList.remove('show');
+
+            // Scroll to top
+            window.scrollTo(0,0);
+        }
+
+        function toggleMenu() {
+            document.getElementById('mainMenu').classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

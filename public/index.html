@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Loading…</title>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <style>
+    :root{--bg1:#fff7fb;--bg2:#f7f6ff;--card:#ffffffcc;--text:#2b2b2b;--muted:#777;--accent:#ff5aa5;--accent2:#7a5cff;--ring:#e9e9ff}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--text);
+      background:radial-gradient(900px 600px at 20% 20%, var(--bg2), transparent 60%),
+               radial-gradient(900px 600px at 80% 10%, var(--bg1), transparent 60%),
+               linear-gradient(180deg,#fff,#fff);padding:20px}
+    .card{width:min(520px,92vw);background:var(--card);border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:22px 20px;
+      box-shadow:0 10px 30px rgba(0,0,0,.06);backdrop-filter: blur(8px);text-align:center}
+    .brand{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px}
+    .logo{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg, rgba(255,90,165,.14), rgba(122,92,255,.14));border:1px solid rgba(0,0,0,.06)}
+    .title{font-weight:700;font-size:18px;letter-spacing:.2px;margin:0}
+    .spinnerWrap{margin:18px auto 8px;width:72px;height:72px;border-radius:999px;display:grid;place-items:center;
+      background:conic-gradient(from 180deg, rgba(255,90,165,.25), rgba(122,92,255,.25), rgba(255,90,165,.25));animation:glow 1.6s ease-in-out infinite}
+    @keyframes glow{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+    .spinner{width:58px;height:58px;border-radius:999px;background:#fff;border:1px solid rgba(0,0,0,.05);display:grid;place-items:center;overflow:hidden}
+    .spinner:before{content:"";width:42px;height:42px;border-radius:999px;border:4px solid var(--ring);border-top-color:var(--accent);border-right-color:var(--accent2);animation:spin .9s linear infinite;display:block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .status{margin-top:10px;font-size:13px;color:var(--muted)}
+    .dots::after{content:"";display:inline-block;width:18px;text-align:left;animation:dots 1.2s steps(4,end) infinite}
+    @keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}100%{content:""}}
+    .fallback{margin-top:14px;display:none}
+    .btn{display:inline-block;padding:10px 14px;border-radius:12px;border:1px solid rgba(0,0,0,.08);background:#fff;cursor:pointer;text-decoration:none;color:var(--text);font-weight:600;font-size:13.5px}
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M12 21s-7-4.6-9.3-9C1 8.6 3 6 6 6c1.8 0 3.1.9 4 2.1C10.9 6.9 12.2 6 14 6c3 0 5 2.6 3.3 6-2.3 4.4-9.3 9-9.3 9Z" fill="url(#g)"/>
+          <path d="M18.7 3.3l.6 1.6 1.6.6-1.6.6-.6 1.6-.6-1.6-1.6-.6 1.6-.6.6-1.6Z" fill="rgba(122,92,255,.9)"/>
+          <defs>
+            <linearGradient id="g" x1="6" y1="6" x2="18" y2="21" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#ff5aa5"/><stop offset="1" stop-color="#7a5cff"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <p class="title">Fertility Planning Assistant</p>
+    </div>
+
+    <div class="spinnerWrap" aria-hidden="true"><div class="spinner"></div></div>
+    <div class="status">Loading<span class="dots"></span></div>
+
+    <div class="fallback" id="fallback">
+      <a class="btn" id="goHome" href="condition.html">ไปหน้าเริ่มต้น</a>
+    </div>
+  </div>
+
+  <script>
+    // basePath อัตโนมัติ (ทำให้ทำงานได้ทั้งอยู่ root หรืออยู่ /liff/)
+    const basePath = new URL(".", window.location.href).pathname; // ends with /
+    const origin = window.location.origin;
+
+    // allow เฉพาะไฟล์ที่มีจริง (ลด state เพี้ยนจน LINE บางเคส 400/หรือไป 404)
+    const ALLOW = new Set(["condition.html","FertilityCheck.html","questionnaire.html"]);
+
+    const fallbackRel = "condition.html";
+    const fallbackUrl = origin + basePath + fallbackRel;
+    document.getElementById("goHome").href = fallbackUrl;
+
+    function getParamFromSearchOrHash(key) {
+      const s = new URLSearchParams(window.location.search);
+      if (s.has(key)) return s.get(key);
+
+      const raw = (window.location.hash || "").replace(/^#\/?/, "");
+      const q = raw.startsWith("?") ? raw.slice(1) : raw;
+      const h = new URLSearchParams(q);
+      if (h.has(key)) return h.get(key);
+
+      return null;
+    }
+
+    function cleanState(raw) {
+      if (!raw) return null;
+
+      // กัน URL เต็ม
+      try {
+        if (/^https?:\/\//i.test(raw)) {
+          const u = new URL(raw);
+          raw = u.pathname + (u.search || "");
+        }
+      } catch(e){}
+
+      raw = String(raw).trim();
+
+      // ตัด hash ทิ้ง
+      raw = raw.split("#")[0];
+
+      // จำกัดความยาว (กัน state ยาวเวอร์)
+      if (raw.length > 200) return null;
+
+      // ทำให้เป็น relative ในโฟลเดอร์เดียวกัน
+      if (raw.startsWith("/")) raw = raw.slice(1);
+
+      // กัน path traversal
+      if (raw.includes("..")) return null;
+
+      // เหลือเฉพาะชื่อไฟล์ + query สั้น ๆ
+      return raw || null;
+    }
+
+    const rawState = getParamFromSearchOrHash("liff.state");
+    const rel = cleanState(rawState);
+
+    let targetUrl = fallbackUrl;
+
+    if (rel) {
+      const fileOnly = rel.split("?")[0];
+      if (ALLOW.has(fileOnly)) {
+        targetUrl = origin + basePath + rel;
+      }
+    }
+
+    // กันค้าง: เกิน 1.2 วิโชว์ปุ่ม
+    const t = setTimeout(() => {
+      document.getElementById("fallback").style.display = "block";
+    }, 1200);
+
+    clearTimeout(t);
+    window.location.replace(targetUrl);
+  </script>
+</body>
+</html>

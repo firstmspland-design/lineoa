@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fertility Planning Assistant</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+  <!-- Babel -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- LIFF SDK -->
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind theme config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Sarabun', 'sans-serif'] },
+          colors: {
+            tealMain: "#0D9488",
+            tealDark: "#0F766E",
+            coral: "#FF9B85",
+            cream: "#FFF8F0",
+            textMain: "#134E4A",
+            textSub: "#64748B",
+            stroke: "#E2E8F0"
+          },
+          boxShadow: {
+            soft: "0 10px 40px -10px rgba(13, 148, 136, 0.18)"
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #FFF8F0; /* Cream */
+      -webkit-font-smoothing: antialiased;
+    }
+    .fade-in { animation: fadeIn 0.5s ease-in-out; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Option hover/selected tuned to Teal+Coral */
+    .option-card:hover {
+      border-color: rgba(13, 148, 136, 0.55);
+      background-color: rgba(240, 253, 250, 1); /* teal-50-ish */
+    }
+    .option-selected {
+      border-color: #0D9488;
+      background-color: #F0FDFA;
+      box-shadow: 0 6px 12px -6px rgba(13, 148, 136, 0.25);
+    }
+
+    /* Subtle active shake */
+    .shake { animation: shake 0.25s ease-in-out; }
+    @keyframes shake {
+      0%{transform:translateX(0)}
+      25%{transform:translateX(-2px)}
+      50%{transform:translateX(2px)}
+      75%{transform:translateX(-1px)}
+      100%{transform:translateX(0)}
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const stepsData = [
+      {
+        step: 1,
+        title: "บริบทชีวิต",
+        question: "ตอนนี้คุณอยู่ในช่วงไหนของการวางแผนมีลูก?",
+        subtext: "เพื่อให้เราเข้าใจเป้าหมายของคุณ",
+        type: "single",
+        options: [
+          { label: "กำลังคิดจะมีลูก", score: 0 },
+          { label: "พยายามมีลูกอยู่", score: 1 },
+          { label: "พยายามมานานแล้ว แต่ยังไม่สำเร็จ", score: 3 },
+          { label: "เคยรักษามาแล้ว แต่อยากประเมินใหม่", score: 2 }
+        ]
+      },
+      {
+        step: 2,
+        title: "เวลา (Trigger หลัก)",
+        question: "คุณพยายามมีลูกมานานแค่ไหนแล้ว?",
+        subtext: "ระยะเวลาเป็นปัจจัยสำคัญในการวินิจฉัย",
+        type: "single",
+        options: [
+          { label: "ยังไม่ได้เริ่มจริงจัง", score: 0 },
+          { label: "น้อยกว่า 6 เดือน", score: 1 },
+          { label: "6–12 เดือน", score: 2 },
+          { label: "มากกว่า 1 ปี", score: 4 }
+        ]
+      },
+      {
+        step: 3,
+        title: "อายุของคุณ",
+        question: "อายุของคุณอยู่ในช่วงไหน?",
+        subtext: "ข้อมูลนี้จะถูกเก็บเป็นความลับ",
+        type: "single",
+        options: [
+          { label: "ต่ำกว่า 30 ปี", score: 0 },
+          { label: "30–34 ปี", score: 1 },
+          { label: "35–39 ปี", score: 3 },
+          { label: "40 ปีขึ้นไป", score: 5 }
+        ]
+      },
+      {
+        step: 4,
+        title: "สัญญาณร่างกาย",
+        question: "ในช่วงที่ผ่านมา คุณมีอาการเหล่านี้หรือไม่?",
+        subtext: "เลือกได้มากกว่า 1 ข้อ",
+        type: "multiple",
+        options: [
+          { label: "รอบเดือนมาไม่สม่ำเสมอ", score: 2 },
+          { label: "ปวดท้องประจำเดือนมาก", score: 2 },
+          { label: "ประจำเดือนขาด / มาน้อยผิดปกติ", score: 2 },
+          { label: "เคยแท้งมาก่อน", score: 3 },
+          { label: "เคยผ่าตัดมดลูก / รังไข่", score: 3 },
+          { label: "ไม่มีอาการผิดปกติที่สังเกตได้", score: 0 }
+        ]
+      },
+      {
+        step: 5,
+        title: "สุขภาพฝ่ายชาย",
+        question: "เคยตรวจสุขภาพฝ่ายชายหรือยัง?",
+        subtext: "เพราะสาเหตุอาจมาจากทั้งสองฝ่าย",
+        type: "single",
+        options: [
+          { label: "ยังไม่เคย", score: 1 },
+          { label: "เคยตรวจแล้ว", score: 0 },
+          { label: "ยังไม่แน่ใจ / ยังไม่ได้คุยกันจริงจัง", score: 0 }
+        ]
+      },
+      {
+        step: 6,
+        title: "ประวัติการรักษา",
+        question: "เคยรักษาด้านการมีบุตรมาก่อนหรือไม่?",
+        subtext: "เพื่อให้เราแนะนำขั้นตอนต่อไปได้ถูกต้อง",
+        type: "single",
+        options: [
+          { label: "ยังไม่เคย", score: 0 },
+          { label: "เคยกินยา / ฉีดยากระตุ้นไข่", score: 2 },
+          { label: "เคยทำ IUI", score: 3 },
+          { label: "เคยทำ IVF / ICSI", score: 4 }
+        ]
+      },
+      {
+        step: 7,
+        title: "เป้าหมาย",
+        question: "ตอนนี้คุณอยากรู้เรื่องอะไรมากที่สุด?",
+        subtext: "เราจะช่วยสรุปแนวทางให้คุณ",
+        type: "single",
+        options: [
+          { label: "ควรเริ่มตรวจอะไรดี", score: 0 },
+          { label: "ยังพอรอได้ไหม", score: 0 },
+          { label: "ควรรีบพบแพทย์หรือยัง", score: 1 },
+          { label: "อยากวางแผนแบบไม่เร่งเกินไป", score: 0 },
+          { label: "อยากคุยกับผู้เชี่ยวชาญก่อนตัดสินใจ", score: 0 }
+        ]
+      }
+    ];
+
+    function App() {
+      const [currentStep, setCurrentStep] = useState(0);
+      const [answers, setAnswers] = useState({});
+      const [showResult, setShowResult] = useState(false);
+      const [totalScore, setTotalScore] = useState(0);
+      const [userProfile, setUserProfile] = useState(null);
+      const [isSubmitting, setIsSubmitting] = useState(false);
+      const [shakeMsg, setShakeMsg] = useState(false);
+
+      const showSessionAlert = () => {
+        alert(JSON.stringify({
+            pdpa_required: sessionStorage.getItem("pdpa_required"),
+            pdpa_marketing: sessionStorage.getItem("pdpa_marketing"),
+            consent_version: sessionStorage.getItem("consent_version"),
+            pdpa_accepted_at: sessionStorage.getItem("pdpa_accepted_at"),
+            pdpa_expires_at: sessionStorage.getItem("pdpa_expires_at"),
+        }, null, 2));
+     };
+
+
+      // ✅ Guard: ต้องยอมรับ PDPA ก่อน + ไม่หมดอายุ
+      useEffect(() => {
+        const required = sessionStorage.getItem("pdpa_required") === "1";
+        const exp = Number(sessionStorage.getItem("pdpa_expires_at") || "0");
+        const valid = required && exp && Date.now() < exp;
+
+        if (!valid) {
+          // ล้างไว้กัน state ค้าง
+          sessionStorage.removeItem("pdpa_required");
+          sessionStorage.removeItem("pdpa_marketing");
+          sessionStorage.removeItem("consent_version");
+          sessionStorage.removeItem("pdpa_accepted_at");
+          sessionStorage.removeItem("pdpa_expires_at");
+          window.location.replace("condition.html");
+        }
+      }, []);
+
+      // Init LIFF (ถ้าจะใช้จริงค่อยเปิด)
+      useEffect(() => {
+        const initLiff = async () => {
+          try {
+            console.log("LIFF Init Mocked");
+            // ตัวอย่างใช้งานจริง:
+            // await liff.init({ liffId: "YOUR_LIFF_ID" });
+            // if (liff.isLoggedIn()) setUserProfile(await liff.getProfile());
+          } catch (err) {
+            console.error("LIFF Init failed", err);
+          }
+        };
+        initLiff();
+      }, []);
+
+      const handleOptionSelect = (optionLabel, score) => {
+        const currentQ = stepsData[currentStep];
+
+        if (currentQ.type === 'single') {
+          setAnswers(prev => ({
+            ...prev,
+            [currentStep]: { labels: [optionLabel], score: score }
+          }));
+        } else {
+          const currentAns = answers[currentStep] || { labels: [], score: 0 };
+          let newLabels = [...currentAns.labels];
+          let newScore = currentAns.score;
+
+          if (newLabels.includes(optionLabel)) {
+            newLabels = newLabels.filter(l => l !== optionLabel);
+            newScore -= score;
+          } else {
+            if (optionLabel === "ไม่มีอาการผิดปกติที่สังเกตได้") {
+              newLabels = [optionLabel];
+              newScore = 0;
+            } else {
+              newLabels = newLabels.filter(l => l !== "ไม่มีอาการผิดปกติที่สังเกตได้");
+              newLabels.push(optionLabel);
+              newScore += score;
+            }
+          }
+
+          setAnswers(prev => ({
+            ...prev,
+            [currentStep]: { labels: newLabels, score: newScore }
+          }));
+        }
+      };
+
+      const isStepValid = () => {
+        const ans = answers[currentStep];
+        return ans && ans.labels.length > 0;
+      };
+
+      const handleNext = () => {
+        if (!isStepValid()) {
+          setShakeMsg(true);
+          setTimeout(() => setShakeMsg(false), 250);
+          return;
+        }
+        if (currentStep < stepsData.length - 1) {
+          setCurrentStep(prev => prev + 1);
+        } else {
+          calculateAndFinish();
+        }
+      };
+
+      const handleBack = () => {
+        if (currentStep > 0) {
+          setCurrentStep(prev => prev - 1);
+        }
+      };
+
+      const calculateAndFinish = async () => {
+        let score = 0;
+        Object.values(answers).forEach(ans => { score += ans.score; });
+        setTotalScore(score);
+
+        setIsSubmitting(true);
+        await saveDataToBackend(score);
+        setIsSubmitting(false);
+        setShowResult(true);
+      };
+
+      const saveDataToBackend = async (finalScore) => {
+        const payload = {
+          userId: userProfile?.userId || sessionStorage.getItem("line_user_id") || 'guest',
+          displayName: userProfile?.displayName || 'Guest User',
+          consent: {
+            required: sessionStorage.getItem("pdpa_required") === "1",
+            marketing: sessionStorage.getItem("pdpa_marketing") === "1",
+            version: sessionStorage.getItem("consent_version") || "unknown",
+            acceptedAt: sessionStorage.getItem("pdpa_accepted_at") || null
+          },
+          answers: answers,
+          totalScore: finalScore,
+          timestamp: new Date().toISOString()
+        };
+        console.log("Sending data to backend:", payload);
+
+        // TODO: ใส่ fetch() จริงตอนมี backend
+        return new Promise(resolve => setTimeout(resolve, 900));
+      };
+
+      if (showResult) return <ResultPage score={totalScore} />;
+
+      const currentQ = stepsData[currentStep];
+      const currentAns = answers[currentStep] || { labels: [] };
+
+      return (
+        <div className="min-h-screen bg-cream flex flex-col items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white rounded-3xl shadow-soft overflow-hidden relative fade-in border border-stroke">
+
+            {/* Header & Progress */}
+            <div className="p-6 text-white"
+              style={{ background: "linear-gradient(135deg, #0D9488 0%, #115E59 100%)" }}>
+              <div className="flex justify-between items-center mb-4">
+                <h1 className="text-xl font-bold">
+                  <i className="fas fa-heart mr-2 text-coral"></i>
+                  วางแผนมีลูก
+                </h1>
+                <span className="text-xs bg-white/15 px-3 py-1 rounded-full font-semibold">
+                  ขั้นตอน {currentStep + 1}/{stepsData.length}
+                </span>
+              </div>
+
+              <div className="w-full bg-white/25 rounded-full h-2">
+                <div
+                  className="bg-white h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${((currentStep + 1) / stepsData.length) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+
+            {/* Question Content */}
+            <div className="p-6 pb-24">
+              <div className="mb-2 text-tealMain font-semibold text-sm uppercase tracking-wide">
+                {currentQ.title}
+              </div>
+
+              <div className="flex items-center justify-end mb-3">
+                <button
+                    type="button"
+                    onClick={showSessionAlert}
+                    className="px-4 py-2 rounded-xl text-xs font-bold border border-stroke bg-white hover:bg-slate-50 text-tealDark"
+                    title="ดูค่า sessionStorage"
+                >
+                    <i className="fas fa-bug mr-2 text-coral"></i>
+                    ดูค่า Session
+                </button>
+                </div>
+
+
+
+              <h2 className="text-2xl font-bold text-textMain mb-2">{currentQ.question}</h2>
+              <p className="text-textSub mb-6 text-sm">{currentQ.subtext}</p>
+
+              <div className="space-y-3">
+                {currentQ.options.map((opt, idx) => {
+                  const isSelected = currentAns.labels.includes(opt.label);
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => handleOptionSelect(opt.label, opt.score)}
+                      className={`
+                        option-card cursor-pointer border-2 rounded-xl p-4 flex items-center transition-all duration-200
+                        ${isSelected ? 'option-selected border-tealMain bg-[#F0FDFA]' : 'border-stroke bg-white'}
+                      `}
+                    >
+                      <div className={`
+                        w-6 h-6 rounded-full border-2 mr-4 flex items-center justify-center flex-shrink-0
+                        ${isSelected ? 'border-tealMain bg-tealMain' : 'border-slate-300 bg-white'}
+                      `}>
+                        {isSelected && <i className="fas fa-check text-white text-xs"></i>}
+                      </div>
+
+                      <span className={`font-medium ${isSelected ? 'text-tealDark' : 'text-slate-700'}`}>
+                        {opt.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {!isStepValid() && (
+                <div className={`mt-5 text-xs text-coral font-semibold bg-coral/10 border border-coral/20 rounded-xl px-4 py-3 ${shakeMsg ? 'shake' : ''}`}>
+                  กรุณาเลือกอย่างน้อย 1 ข้อ เพื่อไปต่อ
+                </div>
+              )}
+            </div>
+
+            {/* Footer Navigation */}
+            <div className="absolute bottom-0 left-0 w-full bg-white border-t border-stroke p-4 flex justify-between items-center">
+              <button
+                onClick={handleBack}
+                disabled={currentStep === 0}
+                className={`
+                  px-6 py-3 rounded-xl font-medium transition-colors
+                  ${currentStep === 0 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-600 hover:bg-slate-50'}
+                `}
+              >
+                <i className="fas fa-arrow-left mr-2"></i> ย้อนกลับ
+              </button>
+
+              <button
+                onClick={handleNext}
+                disabled={!isStepValid() || isSubmitting}
+                className={`
+                  px-8 py-3 rounded-xl font-bold text-white transition-all transform active:scale-95 flex items-center
+                  ${(!isStepValid() || isSubmitting)
+                    ? 'bg-slate-300 cursor-not-allowed shadow-none'
+                    : 'bg-tealMain hover:bg-tealDark shadow-lg hover:shadow-tealMain/30'}
+                `}
+              >
+                {isSubmitting ? (
+                  <span><i className="fas fa-spinner fa-spin mr-2"></i> ประมวลผล</span>
+                ) : (
+                  currentStep === stepsData.length - 1 ? (
+                    <span>ดูผลลัพธ์ <i className="fas fa-check ml-2 text-coral"></i></span>
+                  ) : (
+                    <span>ต่อไป <i className="fas fa-arrow-right ml-2"></i></span>
+                  )
+                )}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      );
+    }
+
+    function ResultPage({ score }) {
+      let resultLevel = {};
+
+      if (score <= 5) {
+        resultLevel = {
+          level: 1,
+          color: "text-tealMain",
+          bg: "bg-[#F0FDFA]",
+          border: "border-tealMain/20",
+          icon: "fas fa-face-smile",
+          title: "ระดับ 1: ยังพอวางแผนได้",
+          desc: "สุขภาพเบื้องต้นดูดี สามารถเริ่มจากการดูแลสุขภาพ นับวันตกไข่ และวางแผนตรวจพื้นฐานเมื่อพร้อม",
+          cta: "อ่านบทความเตรียมตัวมีบุตร",
+          link: "#article",
+          btnBg: "bg-tealMain hover:bg-tealDark"
+        };
+      } else if (score <= 11) {
+        resultLevel = {
+          level: 2,
+          color: "text-tealDark",
+          bg: "bg-cream",
+          border: "border-tealMain/20",
+          icon: "fas fa-user-doctor",
+          title: "ระดับ 2: ควรเริ่มตรวจพื้นฐาน",
+          desc: "มีปัจจัยเสี่ยงเล็กน้อย แนะนำให้เริ่มตรวจพื้นฐานทั้งหญิงและชาย เพื่อวางแผนให้ชัดขึ้น",
+          cta: "ดูแพ็กเกจตรวจสุขภาพ",
+          link: "#package",
+          btnBg: "bg-coral hover:brightness-95"
+        };
+      } else {
+        resultLevel = {
+          level: 3,
+          color: "text-coral",
+          bg: "bg-orange-50",
+          border: "border-orange-200",
+          icon: "fas fa-hospital-user",
+          title: "ระดับ 3: ควรปรึกษาแพทย์",
+          desc: "มีปัจจัยที่อาจทำให้มีบุตรยาก ควรพบแพทย์เฉพาะทางเพื่อประเมินและวางแผนโดยเร็ว",
+          cta: "นัดปรึกษาแพทย์ทันที",
+          link: "#booking",
+          btnBg: "bg-tealMain hover:bg-tealDark"
+        };
+      }
+
+      return (
+        <div className="min-h-screen bg-cream flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white rounded-3xl shadow-soft overflow-hidden p-8 text-center fade-in border border-stroke">
+            <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center text-4xl mb-6 ${resultLevel.bg} ${resultLevel.color} border ${resultLevel.border}`}>
+              <i className={resultLevel.icon}></i>
+            </div>
+
+            <h2 className={`text-2xl font-bold mb-2 ${resultLevel.color}`}>
+              {resultLevel.title}
+            </h2>
+
+            <div className="text-slate-500 text-sm mb-6">
+              คะแนนประเมิน: <span className="font-bold text-textMain">{score}</span>
+            </div>
+
+            <p className="text-slate-600 mb-8 leading-relaxed">
+              {resultLevel.desc}
+            </p>
+
+            <div className="space-y-3">
+              <a href={resultLevel.link}
+                 className={`block w-full py-4 rounded-xl font-bold text-white shadow-lg transition-transform hover:-translate-y-1 ${resultLevel.btnBg}`}>
+                {resultLevel.cta}
+              </a>
+
+              <button onClick={() => window.location.reload()}
+                      className="block w-full py-4 rounded-xl font-medium text-slate-600 hover:bg-slate-50 border border-stroke">
+                ทำแบบประเมินอีกครั้ง
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
